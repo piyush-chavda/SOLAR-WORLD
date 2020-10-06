@@ -15,7 +15,7 @@ input[type=text], select {
   margin: auto;
   width: 30%;
   padding: 50px;
-  margin-top: 30px
+  margin-top: 60px
 }
 
 input[type=submit] {
@@ -42,7 +42,7 @@ input[type=submit]:hover {
  padding-bottom: 50px
   width: 600px;
   height: 400px;
-  margin-top: -100px;
+  margin-top: -20px;
 
 
 }
@@ -62,65 +62,130 @@ h1
   color: #5499C7;
 }
 </style>
+
+
 <body>
 
-<div class="validation">
-  <?php
-    if(isset($_POST['name']) & $_SERVER["REQUEST_METHOD"] == "POST"){
-        $nameErr = $phoneErr = $genderErr = $websiteErr = $msgErr = "";
-        $name = $phone = $gender = $comment = $website = $msg = "";
+<?php
+       
+
+   
+   
+   
+       $phoneErr = $nameErr = $emailErr = $type_Err = $passErr = "";
+       $phone = $name = $email = $type = $pass = "";
+       $isError = false;
+       if ($_SERVER["REQUEST_METHOD"] == "POST"){
+           $email = $_POST["emailid"];
+          //  $pass = $_POST["password"];
+           $name = $_POST["name"];
+           $phone = $_POST['phone'];
 
 
-        if (empty($_POST["name"])) {
-            $nameErr = "required";
-        } else {
-            $name = $_POST["name"];
-        }
+           if(!isset($_POST["type"])){
+               $type_Err = "*A type must be selected"."<br>";
+               $isError = true;
+           }else{
+              $type = $_POST["type"];
+           }
+          
+           if(empty($name)) {
+             $nameErr = "<br>"." name required";
+             $isError = true;
+           }
 
-        if (empty($_POST["phone"])) {
-            $phoneErr = "required";
-        } else {
-            $phone = $_POST["phone"];
-        }
+           if(empty($phone)) {
+            $phoneErr = "<br>"." Phone number required";
+            $isError = true;
+          }
 
-        if (empty($_POST["email"])) {
-            $emailErr = "required";
-        } else {
-            $email = $_POST["email"];
-        }
-         if (empty($_POST["msg"])) {
-            $msgErr = "required";
-        } else {
-            $msgErr = $_POST["msg"];
-        }
-    }
-  
-?>
-</div>
+           if(empty($name)) {
+            $nameErr = "<br>"." name required";
+            $isError = true;
+          }
 
-<div class="center" class="form">
-  <h1 class="contact">Contact us! </h1>
- <form method="post" action="<?php echo $_SERVER["PHP_SELF"];?>">
-     <input type="text" id="name" name="name" placeholder="Name">
-     <span class="error"> <?php if(isset($_POST["name"])) echo $nameErr;?></span>
+           if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $emailErr = "<br>"."Invalid email format";
+            $isError = true;
+          }
 
-    <input type="text" id="company" name="company" placeholder="Company">
 
-    <input type="text" id="phone" name="phone" placeholder="Phone No">
-     <span class="error"><?php if(isset($_POST["phone"])) echo "$phoneErr";?></span>
 
-      <input type="text" id="email" name="email" placeholder="Email">
-      <span class="error"><?php if(isset($_POST["email"])) echo "$emailErr";?></span>
+           if(strlen($pass) <= 8){
+               $passErr = $passErr."<br>"."Password length must be atleast 8 char";
+               $isError = true;
+           }
+           if(!preg_match("#[0-9]+#",$pass)){
+               $passErr = $passErr."<br>"."Password must contain atleast 1 number";
+               $isError = true;
+           }
+           if(!preg_match("#[A-Z]+#",$pass)){
+               $passErr = $passErr."<br>"."Password must contain atleast 1 uppercase";
+               $isError = true;
+           }
+           if(!preg_match("#[a-z]+#",$pass)){
+               $passErr = $passErr."<br>"."Password must contain atleast 1 lowercase";
+               $isError = true;
+           }
+          
+           if(!$isError){
+               if(!isset($_COOKIE[$cookie_name])) {
+                 echo "Cookie named '" . $cookie_name . "' is not set!";
+               } else {
+   //              echo "Cookie '" . $cookie_name . "' is set!<br>";
+   //              echo "Value is: " . $_COOKIE[$cookie_name];
+   //                $_COOKIE["email"] = $email;
+   //                echo "Value is: " . $_COOKIE["email"];
+                  
+                   setcookie("emailid", $email, time() + (86400 * 30), "/");
+                   setcookie("type", $type, time() + (86400 * 30), "/");
+               }
+               header("Location: http://localhost/Resilient/home.php");
+           }
+          
+       }
+      
+      
+      
+       ?>
+          
+   <div class="center" class="form" id="Form">
+         <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>" method="POST" >
+           <h4 class="contact" style="font-weight: bold;">CONTACT US</h4>
+           
+           <input type="text" name="name" placeholder="Enter your name " id="name" autocorrect="off"/>
+             <span class="error" style="color: red">* <?php echo $nameErr;?></span>
+           <br><br>
 
-       <input type="text" id="sub" name="sub" placeholder="Subject">
-        <input type="text" id="msg" name="msg" placeholder="Meassage">
-         <span class="error"><?php if(isset($_POST["msg"])) echo "$msgErr";?></span>
+           <input type="text" name="phone" placeholder="Enter your phone no " id="phone" autocorrect="off"/>
+             <span class="error" style="color: red">* <?php echo $phoneErr;?></span>
+           <br><br>
 
-    </select>
-  
-    <input type="submit" value="Submit">
-  </form>
-</div>
+           <input type="text" name="emailid" placeholder="Enter your email id" id="emailid" autocorrect="off" />
+             <span class="error" style="color: red">* <?php echo $emailErr;?></span>
+           <br><br>
 
-</body>
-</html>
+           
+          <input type="text" id="message" name="message" placeholder="Meassage">
+<!-- 
+           <input type="password" name="password" placeholder="Enter a new password" id="pass" autocapitalize="none" autocorrect="off" style="border-color: #200122; padding:8px; border-radius: 10px;width:250px; " />
+             <span class="error" style="color: red">* <?php echo $passErr;?></span>
+           <br><br> -->
+            
+             <div id="type_box">
+            
+             <!-- <input type="radio" name="type" value="Student" id="type">&nbsp;Student<br>
+             <input type="radio" name="type" value="Employer" id="type">&nbsp;Employer<br>
+                 <span class="error" style="color: red"><?php echo $type_Err;?></span>
+                 </div> -->
+            
+          
+           <input type="submit" id="Button"  value="Register"/>
+         </form>
+         <br>
+         <!-- <a href="#" id="back_to_login_link" style="text-decoration: none; color: black;">Already have an account?</a>
+         <br><br> -->
+        
+        
+         <!-- <a href="#" id="Button" role="button" style="text-decoration: none; ">Login</a>
+       </div> -->
