@@ -71,6 +71,28 @@ h1
 	</style>
 	
 </head>
+<?php
+
+$link = mysqli_connect("localhost", "root", "", "inquiry");
+ 
+// Check connection
+if($link === false){
+    die("ERROR: Could not connect. " . mysqli_connect_error());
+}
+$bill = $area = $type = "";
+
+
+
+$stmt=mysqli_prepare($link,"INSERT INTO inquiry1(monthly_bill, roof_area, purpose) VALUES (?, ?, ?)");
+mysqli_stmt_bind_param($stmt,"sss",$bill,$area,$type);
+// $bill = $_POST['bill'];
+// $area = $_POST['area'];
+// $type = $_POST['type'];
+mysqli_stmt_execute($stmt);
+// $getResult=mysqli_stmt_get_result($pst);
+// Close connection
+mysqli_close($link);
+?>
 <body>
 
 
